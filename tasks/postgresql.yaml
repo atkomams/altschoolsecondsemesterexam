@@ -1,0 +1,42 @@
+---
+- name: update apt
+  apt: 
+    update_cache: yes
+
+- name: install postgresql
+  apt:
+    pkg:
+      - postgresql 
+      - postgresql-contrib
+      - libpq-dev
+      - python3-psycopg2
+
+- name: start and enable postgresql
+  service: name={{ item }} state=started enabled=yes
+  with_items:
+    - postgresql
+
+- name: create db 
+  postgresql_db:
+    state: present
+    name: "{{ db_name }}"
+  become: yes
+  become_user: postgres
+  
+- name: create db user
+  postgresql_user:
+    state: present
+    name:  "{{ db_user }}"
+    password: "{{ db_password }}"
+  become: yes
+  become_user: postgres
+
+- name: grant db user access to atkomams
+  postgresql_privs:
+    type: database
+    database: "{{ db_name}}"
+    roles: "{{db_user}}"
+    grant_option: no
+    privs: all
+  become: yes
+  become_user: postgres

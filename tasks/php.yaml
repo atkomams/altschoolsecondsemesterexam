@@ -1,0 +1,47 @@
+---
+- name: update apt
+  apt: 
+    update_cache: yes
+
+- name: upgrade apt
+  apt:
+    upgrade: yes
+
+- name: install software property
+  apt:
+    name: software-properties-common
+    state: latest
+
+- name: add php repository to apt
+  apt_repository:
+    repo: ppa:ondrej/php
+
+
+- name: update apt
+  apt: 
+    update_cache: yes
+
+- name: install php and extension
+  apt:
+    pkg:
+      - php8.1 
+      - php8.1-pgsql
+      - php8.1-curl
+      - php8.1-cgi
+      - php8.1-xsl
+      - php8.1-cgi
+      - php8.1-gd
+      - php8.1-mbstring
+      - php8.1-zip
+      - php8.1-xmlrpc
+      - php8.1-soap
+      - php8.1-intl
+      - libapache2-mod-php
+      - redis-server
+    state: latest
+    
+    
+   
+
+
+

@@ -1,0 +1,11 @@
+---
+- hosts: servers
+  remote_user: root
+  gather_facts: true
+  become: true
+  vars_files:
+    - ./vars.yaml
+  tasks: 
+    - include_tasks: ./tasks/php.yaml
+    - include_tasks: ./tasks/postgresql.yaml
+
