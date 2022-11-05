@@ -1,0 +1,54 @@
+---
+- name: Update apt
+  apt: update_cache=yes 
+  become: true
+
+- name: Upgrade all packages on servers
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+  become: true
+
+
+
+- name: Install HTTPS transport for APT
+  apt: name=apt-transport-https state=latest
+  become: true
+
+
+- name: Install Debian packages
+  apt: pkg={{item}} state=present update_cache=yes
+  with_items:
+    - wget
+    - curl
+    - make
+    - g++
+    - gcc
+    - libssl-dev
+    - libsasl2-2
+    - libpq-dev
+    - python3-psycopg2
+    - acl
+    - build-essential
+  become: true
+
+
+- name: Install apache
+  apt: name=apache2 state=latest
+  become: true
+
+- name: Install apache2-php8
+  apt: name=php state=latest
+  become: true
+
+
+- name: enabled mod_rewrite
+  apache2_module: name=rewrite state=present
+  notify:
+    - Restart Apache
+  become: true
+
+- name: apache2 listen on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+  notify:
+    - Restart Apache

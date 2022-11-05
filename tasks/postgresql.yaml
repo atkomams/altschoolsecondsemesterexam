@@ -2,6 +2,7 @@
 - name: update apt
   apt: 
     update_cache: yes
+  become: true
 
 - name: install postgresql
   apt:
@@ -10,11 +11,13 @@
       - postgresql-contrib
       - libpq-dev
       - python3-psycopg2
+  become: true
 
 - name: start and enable postgresql
   service: name={{ item }} state=started enabled=yes
   with_items:
     - postgresql
+  become: true
 
 - name: create db 
   postgresql_db:

@@ -2,24 +2,29 @@
 - name: update apt
   apt: 
     update_cache: yes
+  become: true
 
 - name: upgrade apt
   apt:
     upgrade: yes
+  become: true
 
 - name: install software property
   apt:
     name: software-properties-common
     state: latest
+  become: true
 
 - name: add php repository to apt
   apt_repository:
     repo: ppa:ondrej/php
+  become: true
 
 
 - name: update apt
   apt: 
     update_cache: yes
+  become: true
 
 - name: install php and extension
   apt:
@@ -39,6 +44,7 @@
       - libapache2-mod-php
       - redis-server
     state: latest
+  become: true
     
     
    

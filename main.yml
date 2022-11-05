@@ -1,11 +1,30 @@
 ---
 - hosts: servers
-  remote_user: root
+  remote_user: elisha
   gather_facts: true
-  become: true
   vars_files:
     - ./vars.yaml
   tasks: 
     - include_tasks: ./tasks/php.yaml
     - include_tasks: ./tasks/postgresql.yaml
+    - include_tasks: ./tasks/apache.yaml
+    - include_tasks: ./tasks/app.yaml
+    -  include_tasks: ./tasks/tls.yaml
+
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: restart postgres
+      service:
+        name: postgresql
+        state: restarted
 

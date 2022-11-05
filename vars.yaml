@@ -2,3 +2,12 @@
 db_user: elisha
 db_password: elisha118
 db_name: app
+db_host: localhost
+app_env: production
+domain: elitglobalenterprises.top
+http_port: 80
+
+ 
+certbot_package: "python3-certbot-apache"
+certbot_plugin: "apache"
+certbot_mail_address: atkomams@gmail.com

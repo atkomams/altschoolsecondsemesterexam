@@ -5,4 +5,4 @@ ssh_args=-o ForwardAgent=yes
 local_machine ansible_connection=local ansible_host=localhost
 
 [servers]
-212.71.233.44  
+212.71.233.44  ansible_ssh_user=elisha

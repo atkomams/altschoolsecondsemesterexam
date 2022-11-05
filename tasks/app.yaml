@@ -1,0 +1,108 @@
+---
+
+- name: Clone Laravel project
+  git: repo=https://github.com/atkomams/laravel-realworld-example-app.git dest=/var/www/laravel update=no
+ 
+
+
+- name: install composer
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  args:
+    creates: /usr/local/bin/composer
+  become: true
+
+
+- name: Set permissions on Composer
+  become: true
+  file: 
+    path: /usr/local/bin/composer
+    mode: "a+x"
+  become: yes
+    
+
+- name: Change ownership laravel folder
+  file: 
+    path: /var/www/laravel
+    owner: "{{ ansible_effective_user_id }}"
+    group: "{{ ansible_effective_group_id }}"
+    recurse: yes
+  become: yes
+
+- name: set permissions for Laravel storage folder
+  file:
+    path:  /var/www/laravel/storage
+    state: directory
+    recurse: yes
+    mode: '0777'
+    owner: "{{ ansible_effective_user_id }}"
+    group: "{{ ansible_effective_group_id }}"
+  become: yes
+
+- name: Copy file with owner and permission, using symbolic representation
+  command: cp /var/www/laravel/.env.example /var/www/laravel/.env
+  become: true
+
+
+
+- name: set DB_DATABASE
+  lineinfile: dest=/var/www/laravel/.env regexp='^DB_DATABASE=' line=DB_DATABASE={{ db_name }}
+
+- name: set DB_USERNAME
+  lineinfile: dest=/var/www/laravel/.env regexp='^DB_USERNAME=' line=DB_USERNAME={{ db_user }}
+
+- name: set DB_PASSWORD
+  lineinfile: dest=/var/www/laravel/.env regexp='^DB_PASSWORD=' line=DB_PASSWORD={{ db_password }}
+
+- name: set DB_HOST
+  lineinfile: dest=/var/www/laravel/.env regexp='^DB_HOST=' line=DB_PASSWORD={{ db_host }}
+
+- name: set APP_ENV
+  lineinfile: dest=/var/www/laravel/.env regexp='^APP_ENV=' line=DB_PASSWORD={{ app_env }}
+
+- name: Update composer
+  composer:
+    command: update
+    working_dir: /var/www/laravel
+
+
+
+- name: Use composer to install dependencies
+  composer:
+    command: install
+    working_dir: /var/www/laravel
+
+
+
+
+
+
+
+- name: Setup Laravel 
+  shell: |
+      cd /var/www/laravel
+      php artisan key:generate
+      php artisan migrate --force
+  become: true
+
+
+
+
+
+- name: create virtual host file
+
+  copy: 
+    src: ./files/elit.conf.j2 
+    dest: /etc/apache2/sites-available/000-default.conf
+    owner: "{{ ansible_effective_user_id }}"
+    group: "{{ ansible_effective_group_id }}"
+    mode: "0644"
+  become: yes
+
+
+- name: a2ensite {{ domain }}
+  command: a2ensite 000-default.conf
+  args:
+    creates: /etc/apache2/sites-enabled/000-default.conf
+  notify:
+    - Restart Apache
+  become: true
